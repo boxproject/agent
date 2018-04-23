@@ -1,0 +1,25 @@
+{
+  "data_source":{
+    "driver_name":"mysql",
+    "url":"root:Vb28b2OOdVXJ4VzD@tcp(127.0.0.1:3306)/counter?charset=utf8&loc=Asia%2FShanghai",
+    "max_idle":100,
+    "max_conn":100,
+    "alias_name":"default",
+    "debug":true
+  },
+  "level_db_path":"/Users/admin/Work/src/github.com/boxproject/agent/leveldb",
+  "server_cert":"/Users/admin/ssl/server.pem",
+  "server_key":"/Users/admin/ssl/server.key",
+  "client_cert":"/Users/admin/ssl/client.pem",
+  "grpc_ser_port":":50502",
+  "etcd_endpoints":["http://127.0.0.1:2379"],
+  "voucher_name":"voucher",
+  "manager_ip_port":"192.168.199.181:5001",
+  "deposit_url":"http://192.168.199.181:5001/api/v1/capital/deposit",
+  "withdraw_url":"http://192.168.199.181:5001/api/v1/capital/withdraw",
+  "withdraw_tx_url":"http://192.168.199.181:5001/api/v1/capital/withdraw/id",
+  "token_change_url":"http://192.168.199.181:5001/api/v1/capital/curency/add",
+  "regist_approval_url":"http://192.168.199.181:5001/api/v1/registrations/admin/approval",
+  "companion_server":"companion",
+  "voucher_server":"voucher"
+}
