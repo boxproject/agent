@@ -144,8 +144,12 @@ func (v *VoucherController) ApprovalList() {
 			return
 		} else if i > 0 {
 			for _, hashModel := range tHashs {
-				if (hashModel.CaptainId == captainId && hashModel.Status == comm.HASH_STATUS_0) || (hashModel.CaptainId != captainId && hashModel.Status == comm.HASH_STATUS_3) { //待私钥审批员工发起，以及待私钥审批
+				if hashModel.CaptainId == captainId && hashModel.Status == comm.HASH_STATUS_0 { //待私钥A审批
 					rspModel.ApprovalInfos = append(rspModel.ApprovalInfos, comm.ApprovalInfo{Hash: hashModel.Hash, AppId: hashModel.AppId, Name: hashModel.Name, Status: hashModel.Status})
+				} else if hashModel.CaptainId != captainId && hashModel.Status == comm.HASH_STATUS_3 { //待其他私钥审批
+					if !v.getHashOperateOption(hashModel.Hash, captainId) {
+						rspModel.ApprovalInfos = append(rspModel.ApprovalInfos, comm.ApprovalInfo{Hash: hashModel.Hash, AppId: hashModel.AppId, Name: hashModel.Name, Status: hashModel.Status})
+					}
 				}
 			}
 		}
@@ -160,8 +164,25 @@ func (v *VoucherController) ApprovalList() {
 				if hashModel.CaptainId == captainId && hashModel.Status != comm.HASH_STATUS_0 {
 					rspModel.ApprovalInfos = append(rspModel.ApprovalInfos, comm.ApprovalInfo{Hash: hashModel.Hash, AppId: hashModel.AppId, Name: hashModel.Name, Status: hashModel.Status})
 				} else if hashModel.CaptainId != captainId && (hashModel.Status == comm.HASH_STATUS_4 || hashModel.Status == comm.HASH_STATUS_5 || hashModel.Status == comm.HASH_STATUS_6 || hashModel.Status == comm.HASH_STATUS_7) {
-					rspModel.ApprovalInfos = append(rspModel.ApprovalInfos, comm.ApprovalInfo{Hash: hashModel.Hash, AppId: hashModel.AppId, Name: hashModel.Name, Status: hashModel.Status})
+					//if v.getHashOperateOption(hashModel.Hash, captainId) {
+						rspModel.ApprovalInfos = append(rspModel.ApprovalInfos, comm.ApprovalInfo{Hash: hashModel.Hash, AppId: hashModel.AppId, Name: hashModel.Name, Status: hashModel.Status})
+					//}
+				} else if hashModel.CaptainId != captainId && hashModel.Status == comm.HASH_STATUS_3 {
+					if v.getHashOperateOption(hashModel.Hash, captainId) {
+						rspModel.ApprovalInfos = append(rspModel.ApprovalInfos, comm.ApprovalInfo{Hash: hashModel.Hash, AppId: hashModel.AppId, Name: hashModel.Name, Status: hashModel.Status})
+						}
 				}
+			}
+		}
+	} else if rType == comm.APPROVAL_TYPE_2 { //查询公链已同意审批流
+		var tHashs []*model.THash
+		if i, err := db.GetDefaultNewOrmer().QueryTable(&model.THash{}).Filter("Status", comm.HASH_STATUS_7).All(&tHashs); err != nil {
+			log.Error("get hashlist err:%s", err)
+			v.retErrJSON(comm.Err_RDB)
+			return
+		} else if i > 0 {
+			for _, hashModel := range tHashs {
+				rspModel.ApprovalInfos = append(rspModel.ApprovalInfos, comm.ApprovalInfo{Hash: hashModel.Hash, AppId: hashModel.AppId, Name: hashModel.Name, Status: hashModel.Status})
 			}
 		}
 	}
@@ -189,7 +210,7 @@ func (v *VoucherController) ApprovalDetail() {
 		log.Error("query hashOpeate err:", err)
 	} else {
 		for _, hashOpeate := range tHashOperates {
-			rspModel.HashOperates = append(rspModel.HashOperates, comm.HashOperate{AppId: hashOpeate.AppId, Option: hashOpeate.Option})
+			rspModel.HashOperates = append(rspModel.HashOperates, comm.HashOperate{CaptainId: hashOpeate.AppId, Option: hashOpeate.Option})
 		}
 	}
 	v.Data["json"] = rspModel
@@ -203,11 +224,11 @@ func (v *VoucherController) KeyStore() {
 	appName := v.GetString("applyername")
 	//password := v.GetString("password")
 	reqIpPort := v.GetString("reqipport")
-	role := v.GetString("role")
+	code := v.GetString("code")
 	publicKey := v.GetString("publickey")
 	rspModel := &RspModel{RspNo: comm.Err_OK}
 	grpcStream := &comm.GrpcStream{Type: comm.GRPC_VOUCHER_OPR_REQ}
-	grpcStream.VoucherOperate = &comm.Operate{Type: comm.VOUCHER_OPERATE_ADDKEY, AppId: appId, AppName: appName, ReqIpPort: reqIpPort, Role: role, PublicKey: publicKey}
+	grpcStream.VoucherOperate = &comm.Operate{Type: comm.VOUCHER_OPERATE_ADDKEY, AppId: appId, AppName: appName, ReqIpPort: reqIpPort, Code: code, PublicKey: publicKey}
 	if msg, err := json.Marshal(grpcStream); err != nil {
 		log.Error("add keystore marshal err: %s", err)
 	} else {
@@ -224,11 +245,11 @@ func (v *VoucherController) Operate() {
 	password := v.GetString("password")
 	sign := v.GetString("sign")
 	reqIpPort := v.GetString("reqipport")
-	role := v.GetString("role")
+	code := v.GetString("code")
 	publicKey := v.GetString("publickey")
 	rspModel := &RspModel{RspNo: comm.Err_OK}
 	grpcStream := &comm.GrpcStream{Type: comm.GRPC_VOUCHER_OPR_REQ}
-	grpcStream.VoucherOperate = &comm.Operate{Type: operateType, AppId: appId, Password: password, Sign: sign, ReqIpPort: reqIpPort, Role: role, PublicKey: publicKey}
+	grpcStream.VoucherOperate = &comm.Operate{Type: operateType, AppId: appId, Password: password, Sign: sign, ReqIpPort: reqIpPort, Code: code, PublicKey: publicKey}
 	if msg, err := json.Marshal(grpcStream); err != nil {
 		log.Error("opeate marshal err: %s", err)
 		v.retErrJSON(comm.Err_JSON)
@@ -417,7 +438,7 @@ func (v *VoucherController) ApprovalOperateList() {
 		log.Error("query hashOpeate err:", err)
 	} else {
 		for _, hashOpeate := range tHashOperates {
-			rspModel.HashOperates = append(rspModel.HashOperates, comm.HashOperate{AppId: hashOpeate.AppId, Option: hashOpeate.Option})
+			rspModel.HashOperates = append(rspModel.HashOperates, comm.HashOperate{CaptainId: hashOpeate.AppId, Option: hashOpeate.Option})
 		}
 	}
 
@@ -522,7 +543,9 @@ func (v *VoucherController) TokenList() {
 
 func (v *VoucherController) AddToken() {
 	log.Debug("addToken....")
+	appId := v.GetString("applyerid")
 	tokenName := v.GetString("tokenname")
+	sign := v.GetString("sign")
 	decimals, err := v.GetInt64("decimals")
 	if err != nil {
 		v.retErrJSON(comm.Err_UNENABLE_AMOUNT)
@@ -532,11 +555,11 @@ func (v *VoucherController) AddToken() {
 		log.Error("get tokenlist err:%s", err)
 		v.retErrJSON(comm.Err_LDB)
 		return
-	} 
+	}
 
 	rspModel := &RspModel{RspNo: comm.Err_OK}
 	grpcStream := &comm.GrpcStream{Type: comm.GRPC_VOUCHER_OPR_REQ}
-	grpcStream.VoucherOperate = &comm.Operate{Type: comm.VOUCHER_OPERATE_TOKEN_ADD, TokenName: tokenName, Decimals: decimals, ContractAddr: contractAddr}
+	grpcStream.VoucherOperate = &comm.Operate{Type: comm.VOUCHER_OPERATE_TOKEN_ADD, TokenName: tokenName, Decimals: decimals, ContractAddr: contractAddr, Sign: sign, AppId: appId}
 	if msg, err := json.Marshal(grpcStream); err != nil {
 		log.Error("token marshal err: %s", err)
 	} else {
@@ -549,10 +572,12 @@ func (v *VoucherController) AddToken() {
 
 func (v *VoucherController) DelToken() {
 	log.Debug("delToken....")
+	appId := v.GetString("applyerid")
 	contractAddr := v.GetString("contractaddr")
+	sign := v.GetString("sign")
 	rspModel := &RspModel{RspNo: comm.Err_OK}
 	grpcStream := &comm.GrpcStream{Type: comm.GRPC_VOUCHER_OPR_REQ}
-	grpcStream.VoucherOperate = &comm.Operate{Type: comm.VOUCHER_OPERATE_TOKEN_DEL, ContractAddr: contractAddr}
+	grpcStream.VoucherOperate = &comm.Operate{Type: comm.VOUCHER_OPERATE_TOKEN_DEL, ContractAddr: contractAddr, Sign: sign, AppId: appId}
 	if msg, err := json.Marshal(grpcStream); err != nil {
 		log.Error("allow marshal err: %s", err)
 	} else {
@@ -597,4 +622,17 @@ func (v *VoucherController) ManagerInfo() {
 	rspModel := &RspModel{RspNo: comm.Err_OK, ManagerIpPort: comm.MANAGER_SERVER_IPPORT}
 	v.Data["json"] = rspModel
 	v.ServeJSON()
+}
+
+func (v *VoucherController) getHashOperateOption(hash string, appId string) bool {
+	var tHashOperates []*model.THashOperate
+	ormer := db.GetDefaultNewOrmer()
+	if _, err := ormer.QueryTable(&model.THashOperate{}).Filter("Hash", hash).Filter("AppId", appId).All(&tHashOperates); err != nil {
+		log.Error("query hashOpeate err:", err)
+	} else {
+		if len(tHashOperates) > 0 {
+			return true
+		}
+	}
+	return false
 }

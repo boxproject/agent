@@ -134,7 +134,7 @@ const (
 const (
 	APPROVAL_TYPE_0 = "0" //待私钥审批
 	APPROVAL_TYPE_1 = "1" //审批中及审批结束
-	APPROVAL_TYPE_2 = "2" //审批完成
+	APPROVAL_TYPE_2 = "2" //审批完成-同意状态
 )
 
 //grpc stream
@@ -185,7 +185,7 @@ type Operate struct {
 	Hash         string
 	Password     string
 	ReqIpPort    string
-	Role         string
+	Code         string
 	PublicKey    string
 	TokenName    string
 	Decimals     int64
@@ -204,7 +204,7 @@ type VoucherStatus struct {
 	Address         string           //账户地址
 	ContractAddress string           //合约地址
 	BtcAddress      string           //比特币地址
-	D               int64            //随机数
+	D               string            //随机数
 	NodesAuthorized []NodeAuthorized //授权情况
 	KeyStoreStatus  []KeyStoreStatu  //公钥添加状态
 	CoinStatus      []CoinStatu      //币种状态
@@ -278,7 +278,7 @@ type ApprovalInfo struct {
 
 //hash 审批操作
 type HashOperate struct {
-	AppId  string
+	CaptainId  string
 	Option string //同意拒绝
 }
 
