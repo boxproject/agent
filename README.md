@@ -1,6 +1,6 @@
 # agent
 
-[![Build Status](https://travis-ci.org/boxproject/agent.svg?branch=master)](https://travis-ci.org/boxproject/appServerGo) [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![language](https://img.shields.io/badge/golang-%5E1.10-blue.svg)]()
+[![Build Status](https://travis-ci.org/boxproject/agent.svg?branch=master)](https://travis-ci.org/boxproject/agent) [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://www.apache.org/licenses/LICENSE-2.0) [![language](https://img.shields.io/badge/golang-%5E1.10-blue.svg)]()
 
 代理主要为BOX系统私钥APP提供服务，转发voucher、company、appserver、私钥APP等的信息。
 
