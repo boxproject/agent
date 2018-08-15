@@ -1,3 +1,17 @@
+// Copyright 2018. box.la authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package model
 
 import (
@@ -30,11 +44,12 @@ func (this *TReqLog) TableName() string {
 }
 
 type THashOperate struct {
-	Id     int64 `orm:"pk"`
-	AppId  string
-	Type   string
-	Hash   string //请求类型
-	Option string //同意拒绝
+	Id      int64 `orm:"pk"`
+	AppId   string
+	Type    string
+	Hash    string //请求类型
+	Option  string //同意拒绝
+	Opinion string //操作意见[同意或拒绝说明]
 	//Flow       string    //原始数据
 	Sign       string    //签名
 	CreateTime time.Time //创建时间

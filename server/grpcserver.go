@@ -1,3 +1,17 @@
+// Copyright 2018. box.la authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package server
 
 import (
@@ -45,13 +59,13 @@ func (s *replyServer) Router(ctx context.Context, req *proto.RouterRequest) (*pr
 		} else {
 			switch streamModel.Type {
 			case comm.GRPC_DEPOSIT_WEB: //充值上报
-				comm.VReqChan <- &comm.VReq{ReqType: comm.REQ_DEPOSIT, From: streamModel.From, To: streamModel.To, Category: streamModel.Category.Int64(),TxHash: streamModel.TxHash, Amount: streamModel.Amount.String()}
+				comm.VReqChan <- &comm.VReq{ReqType: comm.REQ_DEPOSIT, From: streamModel.From, To: streamModel.To, Category: streamModel.Category.Int64(), TxHash: streamModel.TxHash, Amount: streamModel.Amount.String()}
 				break
 			case comm.GRPC_WITHDRAW_TX_WEB:
 				comm.VReqChan <- &comm.VReq{ReqType: comm.REQ_WITHDRAW_TX, WdHash: streamModel.WdHash.Hex(), TxHash: streamModel.TxHash}
 				break
 			case comm.GRPC_WITHDRAW_WEB: //	提现结果上报
-				comm.VReqChan <- &comm.VReq{ReqType: comm.REQ_WITHDRAW, To: streamModel.To,  Amount: streamModel.Amount.String(), WdHash: streamModel.WdHash.Hex(), TxHash: streamModel.TxHash}
+				comm.VReqChan <- &comm.VReq{ReqType: comm.REQ_WITHDRAW, To: streamModel.To, Amount: streamModel.Amount.String(), WdHash: streamModel.WdHash.Hex(), TxHash: streamModel.TxHash}
 				break
 			//case comm.GRPC_HASH_LIST_WEB: //	审批流上报
 			//	//db
@@ -155,6 +169,7 @@ func (s *replyServer) Router(ctx context.Context, req *proto.RouterRequest) (*pr
 				break
 
 			case comm.GRPC_WITHDRAW_LOG: //私链转账申请
+				logger.Debug("[router-------------->]:%v", streamModel)
 				if wdModel, err := updateWithDrawStatus(streamModel.WdHash.Hex(), comm.WITHDRAW_STATUS_1); err != nil {
 					logger.Error("load err: %s", err)
 				} else {
@@ -168,7 +183,11 @@ func (s *replyServer) Router(ctx context.Context, req *proto.RouterRequest) (*pr
 					}
 				}
 				break
+			case comm.GRPC_CHECK_KEY_WEB: //密码检测
+				//更新密码状态
+				comm.SetPassStatus(streamModel.AppId, streamModel.Status)
 
+				break
 			default:
 				response.Code = comm.Err_UNKNOW_REQ_TYPE
 				logger.Info("unknow web type: %s", streamModel.Type)
@@ -203,7 +222,7 @@ func (s *replyServer) Listen(stream proto.Synchronizer_ListenServer) error {
 	logger.Debug("listReq: %s", listReq.ServerName)
 	key := listReq.ServerName + listReq.Name + listReq.Ip
 	grpcStreamChan := make(chan *comm.GrpcStreamModel, comm.CHAN_MAX_SIZE)
-	quitCh := make(chan bool)
+	quitCh := make(chan bool, 1)
 	s.master.AddWorker(key, grpcStreamChan, quitCh)
 
 	go func() { //监控连接情况
@@ -231,12 +250,13 @@ func (s *replyServer) Listen(stream proto.Synchronizer_ListenServer) error {
 		case <-quitCh:
 			{
 				logger.Debug("recv quitch")
-				if listReq.ServerName == comm.SERVER_VOUCHER{
+				if listReq.ServerName == comm.SERVER_VOUCHER {
 					comm.RealTimeVoucherStatus.ServerStatus = comm.VOUCHER_STATUS_UNCONNETED
 				}
 				//TODO 初始化
-				s.master.RemoveWorkerByName(key)
-				return nil
+				s.master.RemoveWorkerByKey(key)
+				break
+				//return nil
 			}
 		}
 	}

@@ -25,7 +25,7 @@ func StartCmd(c *cli.Context) error {
 		return err
 	}
 	logger.Info("Load config.  %v", cfg)
-
+	config.GConfig = cfg
 	//init relational db
 	if err = db.InitRDB(cfg.DbSource); err != nil {
 		logger.Error("Init relational Db failed . cause: %v", err)
@@ -45,9 +45,9 @@ func StartCmd(c *cli.Context) error {
 	//grpc
 	go initGrpcServer(cfg, master)
 
-
+	logger.Debug("######httpServer_cfg######", cfg)
 	//提供http服务
-	go httpServer()
+	go httpServer(cfg)
 
 	//上报程序
 	repCli := httpcli.NewRepCli(cfg)
@@ -65,7 +65,7 @@ func StartCmd(c *cli.Context) error {
 }
 
 //http
-func httpServer() {
+func httpServer(cfg *config.Config) {
 	beego.Router(ServiceName_KeyStore, &controllers.VoucherController{}, "get,post:KeyStore")
 	beego.Router(ServiceName_Operate, &controllers.VoucherController{}, "get,post:Operate")
 	beego.Router(ServiceName_Status, &controllers.VoucherController{}, "get,post:Status")
@@ -76,6 +76,7 @@ func httpServer() {
 	beego.Router(ServiceName_Regist_Aproval, &controllers.VoucherController{}, "get,post:RegistAproval")
 	beego.Router(ServiceName_Regist_List, &controllers.VoucherController{}, "get,post:RegistList")
 	beego.Router(ServiceName_Approval_Add, &controllers.VoucherController{}, "get,post:AddApproval")
+	beego.Router(ServiceName_Approval_Invalid, &controllers.VoucherController{}, "get,post:InvalidApproval")
 	beego.Router(ServiceName_Approval_List, &controllers.VoucherController{}, "get,post:ApprovalList")
 	beego.Router(ServiceName_Approval_Detail, &controllers.VoucherController{}, "get,post:ApprovalDetail")
 	beego.Router(ServiceName_Approval_Operate_List, &controllers.VoucherController{}, "get,post:ApprovalOperateList")
@@ -86,6 +87,8 @@ func httpServer() {
 	beego.Router(ServiceName_Coin_List, &controllers.VoucherController{}, "get,post:CoinList")
 	beego.Router(ServiceName_Wtihdraw, &controllers.VoucherController{}, "get,post:Wtihdraw")
 	beego.Router(ServiceName_Manager_Info, &controllers.VoucherController{}, "get,post:ManagerInfo")
+	beego.Router(ServiceName_Assets, &controllers.VoucherController{}, "get,post:GetAssets")
+	beego.Router(ServiceName_Trade_History, &controllers.VoucherController{}, "get,post:GetTradeHistory")
 	beego.Run()
 }
 

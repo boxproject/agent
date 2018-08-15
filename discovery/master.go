@@ -1,3 +1,17 @@
+// Copyright 2018. box.la authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package discovery
 
 import (
@@ -38,12 +52,8 @@ func (m *Master) Init() {
 }
 
 func (m *Master) AddWorker(key string, modelChan chan *comm.GrpcStreamModel, quitChan chan bool) {
-	comm.AddChan(key, &comm.GrpcStreamChan{modelChan, quitChan})
 	log.Debug("AddWorker...start", key)
-	//m.KeysAPI.Set(context.Background(), "workers/"+key, "", &client.SetOptions{
-	//	Dir: true,
-	//	//TTL: time.Second * 10,
-	//})
+	comm.AddChan(key, &comm.GrpcStreamChan{modelChan, quitChan})
 	log.Debug("AddWorker...end")
 }
 
@@ -52,19 +62,8 @@ func (m *Master) UpdateWorker(key string) {
 	//m.KeysAPI.Update(context.Background(), "workers/"+key, "")
 }
 
-func (m *Master) RemoveWorkerByName(key string) {
-	m.RemoveWorkerByKey("workers/" + key)
-}
-
 func (m *Master) RemoveWorkerByKey(key string) {
-	//if rsp, err := m.KeysAPI.Delete(context.Background(), key, &client.DeleteOptions{
-	//	Dir: true,
-	//}); err != nil {
-	//	log.Error("delete err: %s", err)
-	//} else {
-	//	log.Debug("rsp:%v", rsp)
-	//	comm.RomoveChan(key)
-	//}
+	comm.RomoveChan(key)
 }
 
 func (m *Master) RouteMsg(routerName string, msg []byte) {

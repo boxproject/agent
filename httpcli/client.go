@@ -1,7 +1,22 @@
+// Copyright 2018. box.la authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package httpcli
 
 import (
 	"encoding/json"
+	"fmt"
 	logger "github.com/alecthomas/log4go"
 	"github.com/boxproject/agent/comm"
 	"github.com/boxproject/agent/config"
@@ -166,5 +181,60 @@ func (r *RepCli) registReq(vReq *comm.VReq) {
 		return
 	} else {
 		logger.Info("cRsp:", cRsp)
+	}
+}
+
+type rRsp struct {
+	RspNo   int           `json:"code"`
+	Message string        `json:"message"`
+	Data    []comm.Assets `json:"data"`
+}
+
+// 余额
+func AssetsReq(appid, page, limit, uri string) (rRsp, error) {
+	data := rRsp{}
+	urls := fmt.Sprintf("%s?appid=%s&page=%v&limit=%v", uri, appid, page, limit)
+	resp, err := http.Get(urls)
+
+	if err != nil {
+		logger.Error("get assets from appServer: %v", err)
+		return data, err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err := json.Unmarshal(body, &data); err != nil {
+		logger.Error("json marshal error: %v", err)
+		return rRsp{}, err
+	} else {
+		logger.Info("cRsp:", data)
+		return data, nil
+	}
+
+}
+
+// 获取交易流水
+func TradeHistory(appid, currency, page, limit, uri string) (comm.TxHistory, error) {
+	data := comm.TxHistory{}
+	//txinfo := txInfo{}
+	urls := fmt.Sprintf("%s?appid=%s&currency=%s&page=%v&limit=%v", uri, appid, currency, page, limit)
+	resp, err := http.Get(urls)
+
+	if err != nil {
+		logger.Error("get assets from appServer: %v", err)
+		return data, err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err := json.Unmarshal(body, &data); err != nil {
+		logger.Error("json marshal error: %v", err)
+		return comm.TxHistory{}, err
+	} else {
+		logger.Info("cRsp:", data)
+		return data, nil
 	}
 }

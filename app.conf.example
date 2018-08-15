@@ -1,0 +1,6 @@
+EnableHTTP = false
+EnableHTTPS = true
+EnableHttpTLS = true
+HTTPSPort = 19092
+HTTPSCertFile = "/opt/box/agent/ssl/server.pem"
+HTTPSKeyFile = "/opt/box/agent/ssl/server.key"

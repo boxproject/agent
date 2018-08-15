@@ -9,8 +9,11 @@ import (
 
 const HASH_PRIFIX = "0x"
 const (
-	FALSE = "0"
-	TRUE  = "1"
+	FALSE   = "0"
+	TRUE    = "1"
+	INVALID = "2"
+	GREATE  = "3"
+	OTHER   = "4"
 )
 
 const (
@@ -28,16 +31,24 @@ const (
 )
 
 const (
-	Err_OK              = "0"   //正确
-	Err_UNKNOW_REQ_TYPE = "10"  //未知请求类型
-	Err_JSON            = "11"  //JSON处理失败
-	Err_LDB             = "12"  //leveldb处理失败
-	Err_RDB             = "13"  //关系型数据库处理失败
-	Err_SERVER_NOTFOUND = "100" //服务未发现
-	Err_UNENABLE_PREFIX = "101" //非法hash前缀
-	Err_UNENABLE_LENGTH = "102" //非法hash值长度
-	Err_UNENABLE_AMOUNT = "103" //非法金额
-	Err_DATE            = "104" //非法金额
+	Err_OK                = "0"   //正确
+	Err_UNKNOW_REQ_TYPE   = "10"  //未知请求类型
+	Err_JSON              = "11"  //JSON处理失败
+	Err_LDB               = "12"  //leveldb处理失败
+	Err_RDB               = "13"  //关系型数据库处理失败
+	Err_SERVER_NOTFOUND   = "100" //服务未发现
+	Err_UNENABLE_PREFIX   = "101" //非法hash前缀
+	Err_UNENABLE_LENGTH   = "102" //非法hash值长度
+	Err_UNENABLE_AMOUNT   = "103" //非法金额
+	Err_DATE              = "104" //非法金额
+	Err_UNENABLE_CATEGORY = "105" //非法转账类型
+	Err_UNENABLE_ADDRESS  = "106" //非法地址格式
+	Err_WRONG_PASS        = "107" //错误密码
+	Err_VOUCHER_REQERR    = "108" //请求voucher错误
+	Err_APPSERVER         = "109" // 请求appServer失败
+	Err_USER              = "110" // 非法用户
+	Err_SIGN              = "111" // 签名信息错误
+	Err_REPEAT_REQ        = "112" //重复请求
 )
 
 //签名机状态
@@ -85,6 +96,8 @@ const (
 	GRPC_COIN_LIST_WEB    = "16" //coin上报
 	GRPC_HASH_ENABLE_WEB  = "17" //hash enable 公链log
 	GRPC_HASH_DISABLE_WEB = "18" //hash enable 公链log
+
+	GRPC_CHECK_KEY_WEB = "19" //密码验证
 )
 
 const (
@@ -100,6 +113,7 @@ const (
 	VOUCHER_OPERATE_TOKEN_DEL    = "9"  //token 删除
 	VOUCHER_OPERATE_TOKEN_LIST   = "10" //token list 查询
 	VOUCHER_OPERATE_COIN         = "11" //coin 操作
+	VOUCHER_OPERATE_CHECK_KEY    = "12" //密码验证
 )
 
 const (
@@ -120,6 +134,7 @@ const (
 	HASH_STATUS_6 = "6" //私链已同意(日志)
 	HASH_STATUS_7 = "7" //公链已同意
 	HASH_STATUS_8 = "8" //公链已拒绝
+	HASH_STATUS_9 = "9" //创建者作废
 
 	WITHDRAW_STATUS_0 = "0" //申请中
 	WITHDRAW_STATUS_1 = "1" //私链已确认
@@ -130,11 +145,21 @@ const (
 	CURRENCY_TYPE_BTC = "0"
 	CURRENCY_TYPE_ETH = "1"
 )
+const (
+	CATEGORY_BTC int64 = 0
+	CATEGORY_ETH int64 = 1
+)
 
 const (
 	APPROVAL_TYPE_0 = "0" //待私钥审批
 	APPROVAL_TYPE_1 = "1" //审批中及审批结束
 	APPROVAL_TYPE_2 = "2" //审批完成-同意状态
+	APPROVAL_TYPE_3 = "3" //审批完成-同意|拒绝状态|作废
+)
+
+const (
+	REG_REJEST   = "1" // 审批注册拒绝
+	REG_APPROVAL = "2" // 审批注册同意
 )
 
 //grpc stream
@@ -162,6 +187,7 @@ type GrpcStream struct {
 }
 
 type TokenInfo struct {
+	Status       string
 	TokenName    string
 	Decimals     int64
 	ContractAddr string
@@ -193,6 +219,7 @@ type Operate struct {
 	CoinCategory int64  //币种分类
 	CoinUsed     bool   //币种使用
 	Sign         string //签名
+	PassSign     string //密码签名
 }
 
 type VoucherStatus struct {
@@ -204,7 +231,7 @@ type VoucherStatus struct {
 	Address         string           //账户地址
 	ContractAddress string           //合约地址
 	BtcAddress      string           //比特币地址
-	D               string            //随机数
+	D               string           //随机数
 	NodesAuthorized []NodeAuthorized //授权情况
 	KeyStoreStatus  []KeyStoreStatu  //公钥添加状态
 	CoinStatus      []CoinStatu      //币种状态
@@ -243,11 +270,42 @@ type VReq struct {
 	CipherText   string
 	PubKey       string
 	Status       string
+	AppID        string
 }
 
 type VRsp struct {
 	Code    int
 	Message string
+}
+
+type Assets struct {
+	Currency string `json:"currency"`
+	Balance  string `json:"balance"`
+}
+
+type TxHistory struct {
+	RspNo   int        `json:"code"`
+	Message string     `json:"message"`
+	Data    TxInfoList `json:"data"`
+}
+
+type TxInfo struct {
+	OrderNum   string `json:"order_number"`
+	Tag        string `json:"tx_info"`
+	Progress   int64  `json:"progress"`
+	Arrived    int64  `json:"arrived"`
+	Amount     string `json:"amount"`
+	Currency   string `json:"currency"`
+	ApplyAt    int64  `json:"apply_at"`
+	TxType     int    `json:"type"`
+	CurrencyID int    `json:"currency_id"`
+}
+
+type TxInfoList struct {
+	Count       int64    `json:"count"`
+	TotalPage   int64    `json:"total_pages"`
+	CurrentPage int64    `json:"current_page"`
+	List        []TxInfo `json:"list"`
 }
 
 //注册信息
@@ -278,8 +336,11 @@ type ApprovalInfo struct {
 
 //hash 审批操作
 type HashOperate struct {
-	CaptainId  string
-	Option string //同意拒绝
+	ApplyerAccount string
+	CaptainId      string
+	Option         string //同意拒绝
+	Opinion        string //操作意见
+	CreateTime     string
 }
 
 //请求channel

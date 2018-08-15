@@ -22,27 +22,30 @@ import (
 )
 
 const (
-	ServiceName_KeyStore          = "/agent/keystore"       //公钥
-	ServiceName_Operate           = "/agent/operate"        //操作
-	ServiceName_Status            = "/agent/status"         //查询状态
-	ServiceName_Allow             = "/agent/allow"          //同意
-	ServiceName_DisAllow          = "/agent/disallow"       //拒绝
-	ServiceName_Regist_Add        = "/agent/registadd"      //添加注册
-	ServiceName_Regist_Aproval    = "/agent/registaproval"  //注册审批
-	ServiceName_Regist_List       = "/agent/registlist"     //查询注册信息
-	ServiceName_Approval_Add      = "/agent/approvaladd"    //审批流新增
-	ServiceName_Approval_List     = "/agent/approvallist"   //审批流列表
-	ServiceName_Approval_Detail   = "/agent/approvaldetail" //审批流详情
-	ServiceName_Approval_Operate_List = "/agent/approvaloplist" //审批流操作列表
+	ServiceName_KeyStore              = "/agent/keystore"        //公钥
+	ServiceName_Operate               = "/agent/operate"         //操作
+	ServiceName_Status                = "/agent/status"          //查询状态
+	ServiceName_Allow                 = "/agent/allow"           //同意
+	ServiceName_DisAllow              = "/agent/disallow"        //拒绝
+	ServiceName_Regist_Add            = "/agent/registadd"       //添加注册
+	ServiceName_Regist_Aproval        = "/agent/registaproval"   //注册审批
+	ServiceName_Regist_List           = "/agent/registlist"      //查询注册信息
+	ServiceName_Approval_Add          = "/agent/approvaladd"     //审批流新增
+	ServiceName_Approval_Invalid      = "/agent/approvalinvalid" //作废审批
+	ServiceName_Approval_List         = "/agent/approvallist"    //审批流列表
+	ServiceName_Approval_Detail       = "/agent/approvaldetail"  //审批流详情
+	ServiceName_Approval_Operate_List = "/agent/approvaloplist"  //审批流操作列表
 	//ServiceName_Hash_Add        = "/agent/hashadd"        //查询hash list
 	//ServiceName_Hash_List       = "/agent/hashlist"       //查询hash list
-	ServiceName_Token_Add    = "/agent/tokenedit" //添加token
-	ServiceName_Token_Del    = "/agent/tokendel"  //删除token
-	ServiceName_Token_List   = "/agent/tokenlist" //查询token list
-	ServiceName_Coin         = "/agent/coin"      //coin
-	ServiceName_Coin_List    = "/agent/coinlist"  //coin list
-	ServiceName_Wtihdraw     = "/agent/wtihdraw"  //提现
-	ServiceName_Manager_Info = "/agent/msinfo"    //管理端信息
+	ServiceName_Token_Add     = "/agent/tokenedit"     //添加token
+	ServiceName_Token_Del     = "/agent/tokendel"      //删除token
+	ServiceName_Token_List    = "/agent/tokenlist"     //查询token list
+	ServiceName_Coin          = "/agent/coin"          //coin
+	ServiceName_Coin_List     = "/agent/coinlist"      //coin list
+	ServiceName_Wtihdraw      = "/agent/wtihdraw"      //提现
+	ServiceName_Manager_Info  = "/agent/msinfo"        //管理端信息
+	ServiceName_Assets        = "/agent/assets"        // 查询余额
+	ServiceName_Trade_History = "/agent/trade/history" // 查询交易流水
 )
 
 var (

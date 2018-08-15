@@ -17,6 +17,8 @@ type Config struct {
 	RegistApprovalUrl string     `json:"regist_approval_url,omitempty"`
 	CompanionServer   string     `json:"companion_server,omitempty"`
 	VoucherServer     string     `json:"voucher_server,omitempty"`
+	Assets            string     `json:"assets_url,omitempty"`
+	TradeHistory      string     `json:"trade_history_url,omitempty"`
 }
 
 type DataSource struct {
@@ -27,3 +29,5 @@ type DataSource struct {
 	AliasName  string `json:"alias_name,omitempty"`
 	Debug      bool   `json:"debug,omitempty"`
 }
+
+var GConfig *Config

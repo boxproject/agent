@@ -7,6 +7,6 @@ import (
 )
 
 func StopCmd(_ *cli.Context) error {
-	_, err := exec.Command("sh", "-c", "pkill -SIGINT companionex").Output()
+	_, err := exec.Command("sh", "-c", "pkill -SIGINT agent").Output()
 	return err
 }

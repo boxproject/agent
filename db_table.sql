@@ -1,23 +1,8 @@
-vicat Premium Data Transfer
-
- Source Server         : localhost
- Source Server Type    : MySQL
- Source Server Version : 50719
- Source Host           : localhost
- Source Database       : counter
-
- Target Server Type    : MySQL
- Target Server Version : 50719
- File Encoding         : utf-8
-
- Date: 03/20/2018 09:59:10 AM
-*/
-
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
---  Table structure for `T_HASH`
+-- Table structure for T_HASH
 -- ----------------------------
 DROP TABLE IF EXISTS `T_HASH`;
 CREATE TABLE `T_HASH` (
@@ -34,22 +19,23 @@ CREATE TABLE `T_HASH` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
---  Table structure for `T_HASH_OPERATE`
+-- Table structure for T_HASH_OPERATE
 -- ----------------------------
 DROP TABLE IF EXISTS `T_HASH_OPERATE`;
 CREATE TABLE `T_HASH_OPERATE` (
   `id` int(20) NOT NULL AUTO_INCREMENT COMMENT 'hash序列',
   `app_id` varchar(20) NOT NULL DEFAULT '' COMMENT '私钥id',
   `type` varchar(20) NOT NULL DEFAULT '' COMMENT '操作类型',
-  `hash` varchar(100) NOT NULL DEFAULT '',
+  `hash` varchar(100) NOT NULL DEFAULT '' COMMENT 'hash',
   `option` varchar(255) NOT NULL DEFAULT '' COMMENT '审批状态',
   `sign` text NOT NULL COMMENT '签名',
-  `create_time` datetime NOT NULL,
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `opinion` varchar(255) NOT NULL DEFAULT '' COMMENT '操作意见',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=132 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
---  Table structure for `T_REGIST`
+-- Table structure for T_REGIST
 -- ----------------------------
 DROP TABLE IF EXISTS `T_REGIST`;
 CREATE TABLE `T_REGIST` (
@@ -68,7 +54,7 @@ CREATE TABLE `T_REGIST` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
---  Table structure for `T_REQ_LOG`
+-- Table structure for T_REQ_LOG
 -- ----------------------------
 DROP TABLE IF EXISTS `T_REQ_LOG`;
 CREATE TABLE `T_REQ_LOG` (
@@ -89,10 +75,10 @@ CREATE TABLE `T_REQ_LOG` (
   `apply_time` datetime NOT NULL,
   `create_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
---  Table structure for `T_WITHDRAW`
+-- Table structure for T_WITHDRAW
 -- ----------------------------
 DROP TABLE IF EXISTS `T_WITHDRAW`;
 CREATE TABLE `T_WITHDRAW` (
@@ -112,4 +98,3 @@ CREATE TABLE `T_WITHDRAW` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 SET FOREIGN_KEY_CHECKS = 1;
-

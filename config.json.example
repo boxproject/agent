@@ -1,0 +1,26 @@
+{
+  "data_source":{
+    "driver_name":"mysql",
+    "url":"boxagent:Box_0_agent@tcp(localhost:3306)/boxagent?charset=utf8&loc=Asia%2FShanghai",
+    "max_idle":100,
+    "max_conn":100,
+    "alias_name":"default",
+    "debug":true
+  },
+  "level_db_path":"/opt/box/agent/leveldb",
+  "server_cert":"/opt/box/agent/certs/server.pem",
+  "server_key":"/opt/box/agent/certs/server.key",
+  "client_cert":"/opt/box/agent/certs/client.pem",
+  "grpc_ser_port":":50502",
+  "voucher_name":"voucher",
+  "manager_ip_port":"127.0.0.1:5001",
+  "deposit_url":"http://127.0.0.1:5001/api/v1/capital/deposit",
+  "withdraw_url":"http://127.0.0.1:5001/api/v1/capital/withdraw",
+  "withdraw_tx_url":"http://127.0.0.1:5001/api/v1/capital/withdraw/id",
+  "token_change_url":"http://127.0.0.1:5001/api/v1/capital/curency/add",
+  "regist_approval_url":"http://127.0.0.1:5001/api/v1/registrations/admin/approval",
+  "assets_url": "http://127.0.0.1:5001/api/v1/capital/assets",
+  "trade_history_url": "http://127.0.0.1:5001/api/v1/history/trade",
+  "companion_server":"companion",
+  "voucher_server":"voucher"
+}
